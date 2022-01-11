@@ -2,8 +2,10 @@ package com.example.demo.security.services;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,24 +26,28 @@ public class UserDetailsImpl implements UserDetails {
 	  @JsonIgnore
 	  private String password;
 
-	  private final Set<GrantedAuthority> authorities = new HashSet<>();
+	  private Collection<? extends GrantedAuthority> authorities;
 
-	  public UserDetailsImpl(Long id, String username, String email, String password) {
+	  public UserDetailsImpl(Long id, String username, String email, String password,
+	      Collection<? extends GrantedAuthority> authorities) {
 	    this.id = id;
 	    this.username = username;
 	    this.email = email;
 	    this.password = password;
-	    this.authorities.add(new SimpleGrantedAuthority("USER"));
+	    this.authorities = authorities;
 	  }
 
 	  public static UserDetailsImpl build(User user) {
+	    List<GrantedAuthority> authorities = user.getRoles().stream()
+	        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+	        .collect(Collectors.toList());
 
 	    return new UserDetailsImpl(
 	        user.getId(), 
 	        user.getUsername(), 
 	        user.getEmail(),
-	        user.getPassword()
-	        );
+	        user.getPassword(), 
+	        authorities);
 	  }
 
 	  @Override
@@ -96,4 +102,4 @@ public class UserDetailsImpl implements UserDetails {
 	    UserDetailsImpl user = (UserDetailsImpl) o;
 	    return Objects.equals(id, user.id);
 	  }
-}
+	}

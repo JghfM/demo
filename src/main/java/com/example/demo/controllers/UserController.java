@@ -13,8 +13,8 @@ import com.example.demo.repositories.UserRepository;
 
 
 @RestController
-//@RequestMapping("/api/test")
-@RequestMapping("/users")
+@RequestMapping("/api/test")
+//@RequestMapping("/users")
 public class UserController {
 	
 	@Autowired
